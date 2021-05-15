@@ -1,38 +1,36 @@
-#Client is the thing which wants to communicate, where receiver 
-#lies for the server
-
+#Server is where the main sender lies
+#Socket is an endpoint of port which are communicating
 #Libraries required
 import socket #Inbuilt python library
 
-#Creating a socket object for the client side
+#Creating a socket object
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 #AF_INET corresponds to IPV4,SOCK_STREAM is  corresponding to 
 #TCP(Transmition Control Protocol)-streaming socket
 
-#Now this socket has to be connected with the server
-s.connect((socket.gethostname(),1234))
-#here we areagain using socket.gethostname, as we are dealing with local
-#server which means on the same system same IP
-#Make sure you have the same ports
+#Bind the socket to some port on the server(local host)
+s.bind((socket.gethostname(),1234))
+#IP sockets the address that we bind to is a tuple of the 
+#hostname and the port number.
 
-#When we connect to the server succesfully, the server sends a message
-#msg=s.recv(1024)
-#1024-her suggests the chunk size of data we receive at a time from the 
-#SOCK_STREAM - TCP we are using
+#Now listen
+s.listen(5)
+#When there re multiple requests from incomimng connections but
+#we can handle one connection at a time, so we can maintain some
+#sort of queue for the incoming connections
+#If someone wants to connect when queue is full, they will be denied
 
-#Display the message
-#print(msg.decode("utf-8")) #Not that we used utf-8 encoding
-
-#Once the message is received, the server gets disconnected
-
-#Here we are confing the data chunk and once we are out of it we lose the
-#message, so we use a while loop to buffer through the stream
-#comment lines 24 and 19 and uncomment below
-full_msg=''#Start with empty string
 while True:
-	msg=s.recv(8)
-	if len(msg)<=0:#Message is empty
-		break
-	full_msg+=msg.decode("utf-8")#Concatenate the broken message
-#Obtain the full message
-print(full_msg)
+	clientsocket,address=s.accept()
+	#Accept any connection and store its address
+	print(f"Connection from {address} has been established!")
+	#Confirmation
+	clientsocket.send(bytes("Welcome to the server","utf-8"))
+	#Send a string literal to the client using the socket obtained 
+	#and send the message by converting to bytes through UTF-8 encoding
+	clientsocket.close()#Close the connnection after sending the message
+	#It helps in making other client connect after processing
+
+#Generally after communicating, the sockets of both client and server are 
+#closed.If not closed the client keeps think there is some message server is 
+#offering and we never will be able to see the full message
