@@ -29,7 +29,8 @@ while True:
 	#Send a string literal to the client using the socket obtained 
 	#and send the message by converting to bytes through UTF-8 encoding
 	clientsocket.close()#Close the connnection after sending the message
-	#It helps in making other client connect,it is optional
+	#It helps in making other client connect after processing
 
 #Generally after communicating, the sockets of both client and server are 
-#closed.
+#closed.If not closed the client keeps think there is some message server is 
+#offering and we never will be able to see the full message
